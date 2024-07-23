@@ -117,6 +117,10 @@ Fianl Score : 105.4543
 
 I placed 9th overall out of 110 registered and 91 active participants. I think I did great at quad selection and coverage, but had extremely bad luck (and a bad strategy?) with foxes. Will update my strategy for foxes if I find out where the 8 foxes I missed were. 
 
-Fun contest!
+##### Some stats
+Samples collected:
+Raspberry Pi w/ Kismet : 50924
+Blackphone 2 : 45628
+JHewitt Rig (only used for last run - about 2 hours on day 3) : 14120
 
 ![IMG_1119.jpeg](IMG_1119.jpeg)
