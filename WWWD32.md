@@ -83,128 +83,7 @@ Day 3 started with a bit more strategy. Around 6am Pacific my uploads from the p
 
 I used the following code to check all my seen networks on previous runs against what I assume were the starting quad wifi networks (potential foxes) to see what networks were left to find, and where to find them.
 
-```
-import json
-import glob
-import os
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement, tostring
-import xml.dom.minidom
-  
-# Function to create KML from a list of network dictionaries
-def create_kml(networks, filename):
-kml = Element('kml')
-document = SubElement(kml, 'Document')
-  
-for network in networks:
-placemark = SubElement(document, 'Placemark')
-name = SubElement(placemark, 'name')
-name.text = network['ssid']
-description = SubElement(placemark, 'description')
-description.text = f"MAC Address: {network['mac']}\nSource File: {network['source_file']}"
-  
-point = SubElement(placemark, 'Point')
-coordinates = SubElement(point, 'coordinates')
-coordinates.text = f"{network['trilong']},{network['trilat']},0"
-  
-dom = xml.dom.minidom.parseString(tostring(kml))
-pretty_kml = dom.toprettyxml()
-  
-with open(filename, 'w') as f:
-f.write(pretty_kml)
-  
-# Function to read potential foxes from JSON files
-def read_potential_foxes(json_files):
-potential_foxes = []
-  
-for json_file in json_files:
-with open(json_file, 'r') as file:
-data = json.load(file)
-for result in data['results']:
-potential_foxes.append({
-'ssid': result['ssid'],
-'mac': result['netid'],
-'trilat': result['trilat'],
-'trilong': result['trilong'],
-'source_file': os.path.basename(json_file)
-})
-  
-return potential_foxes
-  
-# Function to read seen networks from KML files
-def read_seen_networks(kml_files):
-seen_networks = []
-  
-for kml_file in kml_files:
-tree = ET.parse(kml_file)
-root = tree.getroot()
-namespace = {"kml": "http://www.opengis.net/kml/2.2"}
-  
-for placemark in root.findall(".//kml:Placemark", namespace):
-description = placemark.find("kml:description", namespace).text
-if "Type: WIFI" in description:
-mac_address = ""
-ssid = placemark.find("kml:name", namespace).text
-for line in description.split('\n'):
-if line.startswith("Network ID: "):
-mac_address = line.split("Network ID: ")[1].strip()
-seen_networks.append({
-'ssid': ssid,
-'mac': mac_address,
-'source_file': os.path.basename(kml_file)
-})
-  
-return seen_networks
-  
-# Cross-reference potential foxes with seen networks
-def cross_reference_foxes(potential_foxes, seen_networks):
-seen_foxes = []
-target_foxes = []
-  
-seen_mac_set = {network['mac'] for network in seen_networks}
-  
-for fox in potential_foxes:
-if fox['mac'] in seen_mac_set:
-seen_networks_with_mac = [sn for sn in seen_networks if sn['mac'] == fox['mac']]
-for sn in seen_networks_with_mac:
-seen_foxes.append({**fox, 'source_file': sn['source_file']})
-else:
-target_foxes.append(fox)
-  
-return seen_foxes, target_foxes
-  
-# Main script
-json_files = glob.glob("*.json")
-kml_files = glob.glob("seen/*.kml")
-  
-# Read data
-potential_foxes = read_potential_foxes(json_files)
-seen_networks = read_seen_networks(kml_files)
-  
-# Cross-reference
-seen_foxes, target_foxes = cross_reference_foxes(potential_foxes, seen_networks)
-  
-# Create KML files
-create_kml(potential_foxes, 'all_potential_foxes.kml')
-create_kml(seen_foxes, 'seen_foxes.kml')
-create_kml(target_foxes, 'target_foxes.kml')
-  
-# Generate report
-report = (
-f"Total potential foxes: {len(potential_foxes)}\n"
-f"Total seen foxes: {len(seen_foxes)}\n"
-f"Total target foxes: {len(target_foxes)}\n"
-)
-  
-# Save report to text file
-with open('foxhunt_report.txt', 'w') as file:
-file.write(report)
-  
-# Print report to terminal
-print(report)
-  
-print("KML files and report have been created.")
-```
+[combine_and_filter.py](combine_and_filter.py)
 
 This resulted in the following report:
 Total potential foxes: 484
@@ -228,10 +107,16 @@ Total Hours Driven : 15
 New WiFi : ~39,200 + ??? 
 Fox Found Ratio : 0.2 (2/10 foxes found) + ??? 
 
-![Pasted image 20240721213713.png](<Pasted image 20240721213713.png>)
-
 #### The Results
+![Pasted image 20240723065752.png](<Pasted image 20240723065752.png>)
 
-???
+New WiFi: 48509
+New WiFi found ratio : 87.8786
+Fox Found Ratio : 0.2
+Fianl Score : 105.4543
+
+I placed 9th overall out of 110 registered and 91 active participants. I think I did great at quad selection and coverage, but had extremely bad luck (and a bad strategy?) with foxes. Will update my strategy for foxes if I find out where the 8 foxes I missed were. 
+
+Fun contest!
 
 ![IMG_1119.jpeg](IMG_1119.jpeg)
